@@ -98,6 +98,41 @@ export function AdminPanel() {
     fetchProfiles();
   };
 
+  const handleAddFriend = async (friendManagerUser: Profile, friendId: string) => {
+    const friendshipFilter = `user_a_id.eq.${friendManagerUser.id},user_b_id.eq.${friendManagerUser.id}`;
+
+    const { error } = await supabase
+      .from('friendships')
+      .insert({ user_a_id: friendManagerUser.id, user_b_id: friendId })
+      .or(friendshipFilter);
+
+    if (error) {
+      toast({
+        title: "Hata",
+        description: "Arkadaş eklenirken bir hata oluştu",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveFriend = async (friendManagerUser: Profile, friendId: string) => {
+    const friendshipFilter = `user_a_id.eq.${friendManagerUser.id},user_b_id.eq.${friendManagerUser.id}`;
+
+    const { error } = await supabase
+      .from('friendships')
+      .delete()
+      .match({ user_a_id: friendManagerUser.id, user_b_id: friendId })
+      .or(friendshipFilter);
+
+    if (error) {
+      toast({
+        title: "Hata",
+        description: "Arkadaş silinirken bir hata oluştu",
+        variant: "destructive",
+      });
+    }
+  };
+
   const onUserSaved = () => {
     fetchProfiles();
     setIsDialogOpen(false);
