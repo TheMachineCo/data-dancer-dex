@@ -3,7 +3,7 @@ import { Plus, Search, Users, Edit, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { UserEditDialog } from "./UserEditDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,8 @@ export function AdminPanel() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchProfiles = async () => {
@@ -101,6 +103,19 @@ export function AdminPanel() {
     setIsDialogOpen(false);
   };
 
+  const handleAvatarClick = (avatarUrl?: string) => {
+    if (!avatarUrl) return;
+    setSelectedAvatar(avatarUrl);
+    setIsImageDialogOpen(true);
+  };
+
+  const handleImageDialogChange = (open: boolean) => {
+    setIsImageDialogOpen(open);
+    if (!open) {
+      setSelectedAvatar(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-admin-bg flex items-center justify-center">
@@ -151,19 +166,26 @@ export function AdminPanel() {
             <Card key={profile.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-admin-accent/10 flex items-center justify-center overflow-hidden">
-                    {profile.avatar_url ? (
-                      <img 
-                        src={profile.avatar_url} 
+                  {profile.avatar_url ? (
+                    <button
+                      type="button"
+                      onClick={() => handleAvatarClick(profile.avatar_url)}
+                      className="w-12 h-12 rounded-full bg-admin-accent/10 flex items-center justify-center overflow-hidden focus:outline-none focus:ring-2 focus:ring-admin-accent cursor-zoom-in"
+                      aria-label={`${profile.full_name} profil fotoğrafını büyüt`}
+                    >
+                      <img
+                        src={profile.avatar_url}
                         alt={profile.full_name}
                         className="w-full h-full object-cover"
                       />
-                    ) : (
+                    </button>
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-admin-accent/10 flex items-center justify-center overflow-hidden">
                       <span className="text-admin-accent font-semibold">
                         {profile.full_name.charAt(0)}
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-card-foreground truncate">
                       {profile.full_name}
@@ -236,6 +258,18 @@ export function AdminPanel() {
         onOpenChange={setIsDialogOpen}
         onUserSaved={onUserSaved}
       />
+
+      <Dialog open={isImageDialogOpen} onOpenChange={handleImageDialogChange}>
+        <DialogContent className="max-w-5xl w-[90vw] h-[90vh] p-0 bg-transparent border-none shadow-none flex items-center justify-center">
+          {selectedAvatar && (
+            <img
+              src={selectedAvatar}
+              alt="Seçili kullanıcı profil fotoğrafı"
+              className="max-h-full max-w-full object-contain rounded-lg"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
