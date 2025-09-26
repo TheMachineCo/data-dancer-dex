@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      friendship_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          user_a_id: string
+          user_b_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          user_a_id: string
+          user_b_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          user_a_id?: string
+          user_b_id?: string
+        }
+        Relationships: [
+          {
+            columns: ["user_a_id"]
+            foreignKeyName: "friendship_logs_user_a_id_fkey"
+            referencedColumns: ["id"]
+            referencedRelation: "profiles"
+          },
+          {
+            columns: ["user_b_id"]
+            foreignKeyName: "friendship_logs_user_b_id_fkey"
+            referencedColumns: ["id"]
+            referencedRelation: "profiles"
+          },
+        ]
+      }
+      friendships: {
+        Row: {
+          ended_at: string | null
+          id: string
+          started_at: string
+          user_a_id: string
+          user_b_id: string
+        }
+        Insert: {
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          user_a_id: string
+          user_b_id: string
+        }
+        Update: {
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          user_a_id?: string
+          user_b_id?: string
+        }
+        Relationships: [
+          {
+            columns: ["user_a_id"]
+            foreignKeyName: "friendships_user_a_id_fkey"
+            referencedColumns: ["id"]
+            referencedRelation: "profiles"
+          },
+          {
+            columns: ["user_b_id"]
+            foreignKeyName: "friendships_user_b_id_fkey"
+            referencedColumns: ["id"]
+            referencedRelation: "profiles"
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
